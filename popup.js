@@ -13,24 +13,29 @@ document.addEventListener('DOMContentLoaded', event => {
 			tab_id_tree  = response.tab_id_tree;
 			live_id      = response.live_id;
 		} else {
-			/* ニコニコ動画を開いているタブを取得 */
-			browser.tabs.query({url:'*://www.nicovideo.jp/watch/*'}, tabs => {
-				for (let i in tabs) {
-					tabs_video.push({
-						id    : tabs[i].id,
-						title : tabs[i].title.replace(/ - ニコニコ動画$/g, '')
-					});
-				}
-				const select = document.getElementById('nicovideo-tabs');
-				for (let i in tabs_video) {
-					const option = document.createElement('option');
-					option.value = String(i);
-					option.innerText = tabs_video[i].title;
-					select.appendChild(option);
-				}
+			/* ニコ生IDを取得 */
+			browser.tabs.query({active:true,currentWindow:true,url:'*://live2.nicovideo.jp/watch/*'}, tabs => {
+				/* ニコ生IDを取得 */
+				// tabs[0].urlから正規表現で取得...
+				/* ニコニコ動画を開いているタブを取得 */
+				browser.tabs.query({url:'*://www.nicovideo.jp/watch/*'}, tabs => {
+					for (let i in tabs) {
+						tabs_video.push({
+							id    : tabs[i].id,
+							title : tabs[i].title.replace(/ - ニコニコ動画$/g, '')
+						});
+					}
+					const select = document.getElementById('nicovideo-tabs');
+					for (let i in tabs_video) {
+						const option = document.createElement('option');
+						option.value = String(i);
+						option.innerText = tabs_video[i].title;
+						select.appendChild(option);
+					}
+				});
+				/* 要素を表示 */
+				document.getElementById('start').classList.add('visible');
 			});
-			/* 要素を表示 */
-			document.getElementById('start').classList.add('visible');
 		}
 	});
 });
