@@ -1,4 +1,4 @@
-/* 各種情報を取得 --- */
+/* --- 各種情報を取得 --- */
 let is_working   = false;
 let tab_id_video = null;
 let tab_id_tree  = null;

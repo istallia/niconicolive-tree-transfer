@@ -7,4 +7,11 @@ div.hidden-div {
 }
 div.visible {
 	display : block;
+	margin  : 1rem 0px;
+}
+
+
+/* --- 各フォームのスタイル --- */
+select {
+	width : 100%;
 }
