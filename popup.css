@@ -1,0 +1,10 @@
+/* --- 全体の調整 --- */
+body {
+	width : 320px;
+}
+div.hidden-div {
+	display : none;
+}
+div.visible {
+	display : block;
+}
