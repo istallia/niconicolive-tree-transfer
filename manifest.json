@@ -1,0 +1,35 @@
+{
+	"manifest_version" : 2,
+	"name"             : "ニコ生ツリー登録ツール",
+	"version"          : "0.1.0",
+	"description"      : "ニコ生でBGMとしてニコ動を裏で流す際、指定タブ(ニコ動)で開いた動画を自動でコンテンツツリーに登録する拡張機能",
+	"author"           : "istallia",
+	"icons" : {
+		"32"  : "icon_32.png",
+		"48"  : "icon_48.png",
+		"128" : "icon_128.png"
+	},
+	"content_scripts" : [
+		{
+			"matches" : ["http://commons.nicovideo.jp/tree/edit/*", "https://commons.nicovideo.jp/tree/edit/*"],
+			"js"      : ["content-script.js"]
+		}
+	],
+	"background": {
+		"scripts": [
+			"background.js"
+		],
+		"persistent": true
+	},
+	"browser_action" : {
+		"default_title" : "ニコ生ツリー登録ツール",
+		"default_popup" : "popup.html"
+	},
+	"permissions" : [
+		"http://commons.nicovideo.jp/search/*",
+		"https://commons.nicovideo.jp/search/*",
+		"http://commons.nicovideo.jp/material/*",
+		"https://commons.nicovideo.jp/material/*",
+		"tabs"
+	]
+}
