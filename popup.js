@@ -14,9 +14,16 @@ document.addEventListener('DOMContentLoaded', event => {
 			live_id      = response.live_id;
 		} else {
 			/* ニコ生IDを取得 */
-			browser.tabs.query({active:true,currentWindow:true,url:'*://live2.nicovideo.jp/watch/*'}, tabs => {
+			browser.tabs.query({active:true,currentWindow:true}, tabs => {
 				/* ニコ生IDを取得 */
-				// tabs[0].urlから正規表現で取得...
+				const regexp = /live\d\.nicovideo\.jp\/watch\/(lv\d{1,20})/;
+				let matches  = regexp.exec(tabs[0].url);
+				if (matches === null || matches.length < 1) {
+					/* 開いているタブがニコ生ではない場合 */
+					document.getElementById('none').classList.add('visible');
+					return;
+				}
+				live_id = matches[1];
 				/* ニコニコ動画を開いているタブを取得 */
 				browser.tabs.query({url:'*://www.nicovideo.jp/watch/*'}, tabs => {
 					for (let i in tabs) {
@@ -27,8 +34,8 @@ document.addEventListener('DOMContentLoaded', event => {
 					}
 					const select = document.getElementById('nicovideo-tabs');
 					for (let i in tabs_video) {
-						const option = document.createElement('option');
-						option.value = String(i);
+						const option     = document.createElement('option');
+						option.value     = String(i);
 						option.innerText = tabs_video[i].title;
 						select.appendChild(option);
 					}
