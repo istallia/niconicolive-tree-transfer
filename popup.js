@@ -9,9 +9,13 @@ document.addEventListener('DOMContentLoaded', event => {
 	browser.runtime.sendMessage({ctrl:'get-status'}, response => {
 		working = Boolean(response.is_working);
 		if (working) {
+			/* タブのIDも取得(これいる？) */
 			tab_id_video = response.tab_id_video;
 			tab_id_tree  = response.tab_id_tree;
 			live_id      = response.live_id;
+			/* 要素を表示 */
+			document.getElementById('live-id').value = live_id;
+			document.getElementById('working').classList.add('visible');
 		} else {
 			/* ニコ生IDを取得 */
 			browser.tabs.query({active:true,currentWindow:true}, tabs => {
@@ -58,6 +62,7 @@ document.addEventListener('DOMContentLoaded', event => {
 							tab_id_tree  : tab_id_tree
 						}, response => {
 							is_working = true;
+							document.getElementById('live-id').value = live_id;
 							document.getElementById('start').classList.remove('visible');
 							document.getElementById('working').classList.add('visible');
 						});

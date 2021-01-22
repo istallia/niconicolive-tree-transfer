@@ -21,3 +21,7 @@ button {
 	margin      : 0.5rem auto;
 	user-select : none;
 }
+input[type="text"] {
+	width   : calc(100% - 0.4rem);
+	padding : 0.1rem;
+}

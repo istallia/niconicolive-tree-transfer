@@ -16,5 +16,15 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 			tab_id_tree  : tab_id_tree,
 			live_id      : live_id
 		});
+		return;
+	}
+	/* 自動転送の開始 */
+	if (message.ctrl === 'start-transfer') {
+		is_working   = true;
+		live_id      = message.live_id;
+		tab_id_video = message.tab_id_video;
+		tab_id_tree  = message.tab_id_tree;
+		sendResponse({is_working:true});
+		return;
 	}
 });
