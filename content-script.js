@@ -9,15 +9,12 @@ browser.runtime.sendMessage({ctrl:'get-status'}, response => {
 	const target   = document.getElementById('candidate');
 	const observer = new MutationObserver(records => {
 		if (is_working && is_adding && records[0].addedNodes.length > 0) {
-			console.log(records);
 			is_adding             = false;
 			const candidates_area = document.getElementById('candidate');
 			const parents_area    = document.getElementById('parents');
 			let candidates_works  = [... candidates_area.children];
 			let parents_works     = [... parents_area.children].map(li => li.id);
-			console.log(candidates_works);
 			candidates_works      = candidates_works.filter(li => parents_works.indexOf(li.id) === -1);
-			console.log(parents_works);
 			for (let i in candidates_works) {
 				let li = candidates_works[i];
 				parents_area.appendChild(li);
