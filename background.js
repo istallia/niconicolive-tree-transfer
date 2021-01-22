@@ -27,4 +27,12 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		sendResponse({is_working:true});
 		return;
 	}
+	/* 自動転送の停止 */
+	if (message.ctrl === 'stop-transfer') {
+		is_working   = false;
+		live_id      = null;
+		tab_id_video = null;
+		tab_id_tree  = null;
+		sendResponse({is_working:false});
+	}
 });

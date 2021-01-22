@@ -7,6 +7,18 @@ let tabs_video   = [{id:null, title:'(タブを指定しない)'}];
 if (typeof browser === 'undefined') browser = chrome;
 document.addEventListener('DOMContentLoaded', event => {
 	browser.runtime.sendMessage({ctrl:'get-status'}, response => {
+		/* 自動転送停止ボタンにイベント登録 */
+		document.getElementById('stop-transfer').addEventListener('click', () => {
+			browser.runtime.sendMessage({ctrl:'stop-transfer'}, response => {
+				is_working   = false;
+				tab_id_video = null;
+				tab_id_tree  = null;
+				live_id      = null;
+				document.getElementById('working').classList.remove('visible');
+				window.close();
+			});
+		});
+		/* 動作中かどうかで分岐 */
 		working = Boolean(response.is_working);
 		if (working) {
 			/* タブのIDも取得(これいる？) */
