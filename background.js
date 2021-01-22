@@ -54,11 +54,19 @@ browser.tabs.onRemoved.addListener((tab_id, close_info) => {
 
 /* --- タブ更新検知 --- */
 browser.tabs.onUpdated.addListener((tab_id, change_info, tab) => {
-	if (is_working && (tab_id === tab_id_video || tab_id_video === null)) {
-		/* 動画IDを取得 */
-		const regexp = /www\.nicovideo\.jp\/watch\/(sm\d{1,20})/;
-		let matches  = regexp.exec(tabs[0].url);
-		if (matches === null || matches.length < 1) return;
-		const video_id = matches[1];
+	if (is_working && change_info.status === 'complete') {
+		if (tab_id === tab_id_video || tab_id_video === null) {
+			/* 動画IDを取得 */
+			const regexp = /www\.nicovideo\.jp\/watch\/(sm\d{1,20})/;
+			let matches  = regexp.exec(tabs[0].url);
+			if (matches === null || matches.length < 1) return;
+			const video_id = matches[1];
+		} else if (tab_id === tab_id_tree) {
+			/* ツリー登録後のURLか確認 */
+			const regexp = /commons\d\.nicovideo\.jp\/tree\/(lv\d{1,20})/;
+			if (!regexp.test(tab.url)) return;
+			/* ツリー登録ページに戻す */
+			browser.tabs.update(tab_id, {url:'https://commons.nicovideo.jp/tree/edit/'+live_id});
+		}
 	}
 });
