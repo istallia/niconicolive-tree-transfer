@@ -2,29 +2,29 @@
 let is_working = false;
 let is_adding  = false;
 if (typeof browser === 'undefined') browser = chrome;
-document.addEventListener('DOMContentLoaded', event => {
-	browser.runtime.sendMessage({ctrl:'get-status'}, response => {
-		/* 変数の更新 */
-		is_working     = Boolean(response.is_working);
-		document.title = '[転送中] ' + document.title;
-		/* DOM監視イベントの登録 */
-		const target   = document.getElementById('candidate');
-		const observer = new MutationObserver(records => {
-			if (is_working && is_adding) {
-				is_adding             = false;
-				const candidates_area = document.getElementById('candidate');
-				const parents_area    = document.getElementById('parents');
-				let candidates_works  = [... candidates_area.children];
-				let parents_works     = [... parents_area.children].map(li => li.id);
-				candidates_works      = candidates_works.filter(li => parent_works.indexOf(li.id) === -1);
-				for (let i in candidates_works) {
-					let li = candidates_works[i];
-					parents_area.appendChild(li);
-				}
+browser.runtime.sendMessage({ctrl:'get-status'}, response => {
+	/* 変数の更新 */
+	is_working     = Boolean(response.is_working);
+	/* DOM監視イベントの登録 */
+	const target   = document.getElementById('candidate');
+	const observer = new MutationObserver(records => {
+		if (is_working && is_adding && records[0].addedNodes.length > 0) {
+			console.log(records);
+			is_adding             = false;
+			const candidates_area = document.getElementById('candidate');
+			const parents_area    = document.getElementById('parents');
+			let candidates_works  = [... candidates_area.children];
+			let parents_works     = [... parents_area.children].map(li => li.id);
+			console.log(candidates_works);
+			candidates_works      = candidates_works.filter(li => parents_works.indexOf(li.id) === -1);
+			console.log(parents_works);
+			for (let i in candidates_works) {
+				let li = candidates_works[i];
+				parents_area.appendChild(li);
 			}
-		});
-		observer.observe(target, {childList:true});
+		}
 	});
+	observer.observe(target, {childList:true});
 });
 
 
