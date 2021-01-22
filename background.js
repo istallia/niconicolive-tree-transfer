@@ -54,7 +54,7 @@ browser.tabs.onRemoved.addListener((tab_id, close_info) => {
 
 /* --- タブ更新検知 --- */
 browser.tabs.onUpdated.addListener((tab_id, change_info, tab) => {
-	if (is_working && (tab_id === tab_id_video || tab_id === null)) {
+	if (is_working && (tab_id === tab_id_video || tab_id_video === null)) {
 		/* 動画IDを取得 */
 		const regexp = /www\.nicovideo\.jp\/watch\/(sm\d{1,20})/;
 		let matches  = regexp.exec(tabs[0].url);
