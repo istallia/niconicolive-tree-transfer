@@ -40,6 +40,29 @@ document.addEventListener('DOMContentLoaded', event => {
 						select.appendChild(option);
 					}
 				});
+				/* 開始ボタンにイベント登録 */
+				document.getElementById('start-transfer').addEventListener('click', () => {
+					/* 各タブのID取得(ツリー登録ページは新しく開く) */
+					tab_id_video = Number( document.getElementById('nicovideo-tabs').value );
+					tab_id_video = tabs_video[tab_id_video].id;
+					browser.tabs.create({
+						active : false,
+						url    : 'https://commons.nicovideo.jp/tree/edit/' + live_id
+					}, tab => {
+						tab_id_tree = tab.id;
+						/* 取得したIDたちをbackgroundに送信 */
+						browser.runtime.sendMessage({
+							ctrl         : 'start-transfer',
+							live_id      : live_id,
+							tab_id_video : tab_id_video,
+							tab_id_tree  : tab_id_tree
+						}, response => {
+							is_working = true;
+							document.getElementById('start').classList.remove('visible');
+							document.getElementById('working').classList.add('visible');
+						});
+					});
+				});
 				/* 要素を表示 */
 				document.getElementById('start').classList.add('visible');
 			});

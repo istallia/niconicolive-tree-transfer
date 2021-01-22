@@ -11,7 +11,7 @@
 	},
 	"content_scripts" : [
 		{
-			"matches" : ["http://commons.nicovideo.jp/tree/edit/*", "https://commons.nicovideo.jp/tree/edit/*"],
+			"matches" : ["*://commons.nicovideo.jp/tree/edit/*"],
 			"js"      : ["content-script.js"]
 		}
 	],
@@ -26,10 +26,7 @@
 		"default_popup" : "popup.html"
 	},
 	"permissions" : [
-		"http://commons.nicovideo.jp/search/*",
-		"https://commons.nicovideo.jp/search/*",
-		"http://commons.nicovideo.jp/material/*",
-		"https://commons.nicovideo.jp/material/*",
+		"*://commons.nicovideo.jp/tree/edit/*",
 		"tabs"
 	]
 }
