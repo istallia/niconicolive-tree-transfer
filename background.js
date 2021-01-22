@@ -36,3 +36,17 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		sendResponse({is_working:false});
 	}
 });
+
+
+/* --- タブ閉じ検知 --- */
+browser.tabs.onRemoved.addListener((tab_id, close_info) => {
+	if (is_working) {
+		/* 指定タブなら自動転送を停止 */
+		if (tab_id === tab_id_video || tab_id === tab_id_tree) {
+			is_working   = false;
+			live_id      = null;
+			tab_id_video = null;
+			tab_id_tree  = null;
+		}
+	}
+});
