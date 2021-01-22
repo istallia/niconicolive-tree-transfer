@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', event => {
 			});
 		});
 		/* 動作中かどうかで分岐 */
-		working = Boolean(response.is_working);
+		is_working = Boolean(response.is_working);
 		if (working) {
 			/* タブのIDも取得(これいる？) */
 			tab_id_video = response.tab_id_video;
