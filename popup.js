@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', event => {
 		/* 自動転送停止ボタンにイベント登録 */
 		document.getElementById('stop-transfer').addEventListener('click', () => {
 			browser.runtime.sendMessage({ctrl:'stop-transfer'}, response => {
+				browser.tabs.remove(tab_id_tree);
 				is_working   = false;
 				tab_id_video = null;
 				tab_id_tree  = null;
@@ -63,6 +64,7 @@ document.addEventListener('DOMContentLoaded', event => {
 					tab_id_video = tabs_video[tab_id_video].id;
 					browser.tabs.create({
 						active : false,
+						pinned : true,
 						url    : 'https://commons.nicovideo.jp/tree/edit/' + live_id
 					}, tab => {
 						tab_id_tree = tab.id;
