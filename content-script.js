@@ -15,9 +15,14 @@ browser.runtime.sendMessage({ctrl:'get-status'}, response => {
 			let candidates_works  = [... candidates_area.children];
 			let parents_works     = [... parents_area.children].map(li => li.id);
 			candidates_works      = candidates_works.filter(li => parents_works.indexOf(li.id) === -1);
-			for (let i in candidates_works) {
-				let li = candidates_works[i];
-				parents_area.appendChild(li);
+			if (candidates_works.length > 0) {
+				for (let i in candidates_works) {
+					let li = candidates_works[i];
+					parents_area.appendChild(li);
+				}
+				setTimeout(() => {
+					document.getElementById('send_check').dispatchEvent(new Event('click', {bubbles: true, composed: true}));
+				}, 0);
 			}
 		}
 	});
