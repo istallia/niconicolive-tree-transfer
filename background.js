@@ -26,8 +26,8 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		tab_id_tree  = message.tab_id_tree;
 		sendResponse({is_working:true});
 		if (tab_id_tree !== null) {
-			browser.tabs.get(tab_id_tree, tab => {
-				sendToContentsTree(tab.url);
+			browser.tabs.get(tab_id_video, tab => {
+				setTimeout(() => sendToContentsTree(tab.url), 2000);
 			});
 		} else {
 			browser.tabs.query({url:'*://www.nicovideo.jp/watch/*'}, tabs => {
@@ -35,7 +35,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 				for (let i in tabs) {
 					if (urls.length < 10) urls.push(tabs[i].url);
 				}
-				sendArrayToContentsTree(urls);
+				setTimeout(() => sendArrayToContentsTree(urls, 2000));
 			});
 		}
 		return;
@@ -87,7 +87,7 @@ browser.tabs.onUpdated.addListener((tab_id, change_info, tab) => {
 const sendToContentsTree = url => {
 	/* 動画IDを取得 */
 	const regexp = /www\.nicovideo\.jp\/watch\/(sm\d{1,20})/;
-	let matches  = regexp.exec(tab.url);
+	let matches  = regexp.exec(url);
 	if (matches === null || matches.length < 1) return;
 	const video_id = matches[1];
 	/* content-script側に送信 */

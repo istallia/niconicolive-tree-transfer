@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', event => {
 		/* 自動転送停止ボタンにイベント登録 */
 		document.getElementById('stop-transfer').addEventListener('click', () => {
 			browser.runtime.sendMessage({ctrl:'stop-transfer'}, response => {
-				browser.tabs.remove(tab_id_tree);
+				if (tab_id_tree) browser.tabs.remove(tab_id_tree);
 				is_working   = false;
 				tab_id_video = null;
 				tab_id_tree  = null;
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', event => {
 		});
 		/* 動作中かどうかで分岐 */
 		is_working = Boolean(response.is_working);
-		if (working) {
+		if (is_working) {
 			/* タブのIDも取得(これいる？) */
 			tab_id_video = response.tab_id_video;
 			tab_id_tree  = response.tab_id_tree;
