@@ -50,10 +50,12 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		ready        = false;
 		queue        = [];
 		sendResponse({is_working:false});
+		return;
 	}
 	/* チャンネルに紐ついた動画のIDの処理 */
 	if (message.ctrl === 'add-video-so') {
 		addQueue(sender.tab.id, message.url);
+		return;
 	}
 });
 
