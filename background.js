@@ -74,7 +74,7 @@ browser.tabs.onUpdated.addListener((tab_id, change_info, tab) => {
 			sendToContentsTree(tab.url);
 		} else if (tab_id === tab_id_tree) {
 			/* ツリー登録後のURLか確認 */
-			const regexp = /commons\d\.nicovideo\.jp\/tree\/(lv\d{1,20})/;
+			const regexp = /commons\.nicovideo\.jp\/tree\/(lv\d{1,20})/;
 			if (!regexp.test(tab.url)) return;
 			/* ツリー登録ページに戻す */
 			browser.tabs.update(tab_id, {url:'https://commons.nicovideo.jp/tree/edit/'+live_id});
