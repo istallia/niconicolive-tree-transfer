@@ -31,15 +31,12 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		sendResponse({is_working:true});
 		if (tab_id_tree !== null) {
 			browser.tabs.get(tab_id_video, tab => {
-				setTimeout(() => sendToContentsTree(tab.url), 2000);
+				addQueue(tab.id, tab.url);
 			});
 		} else {
 			browser.tabs.query({url:'*://www.nicovideo.jp/watch/*'}, tabs => {
-				let urls = [];
-				for (let i in tabs) {
-					if (urls.length < 10) urls.push(tabs[i].url);
-				}
-				setTimeout(() => sendArrayToContentsTree(urls, 2000));
+				for (let i in tabs.slice(0, -1)) addQueue(tabs[i].id, tabs[i].url, false);
+				addQueue(tabs[tabs.length-1].id, tabs[tabs.length-1].url);
 			});
 		}
 		return;
@@ -56,7 +53,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	}
 	/* チャンネルに紐ついた動画のIDの処理 */
 	if (message.ctrl === 'add-video-so') {
-		sendToContentsTree(message.url);
+		addQueue(sender.tab.id, message.url);
 	}
 });
 
@@ -83,7 +80,7 @@ browser.tabs.onUpdated.addListener((tab_id, change_info, tab) => {
 	if (is_working && change_info.status === 'complete') {
 		if (tab_id === tab_id_video || tab_id_video === null) {
 			/* ツリー登録ページに送信 */
-			sendToContentsTree(tab.url);
+			addQueue(tab_id, tab.url);
 		} else if (tab_id === tab_id_tree) {
 			/* ツリー登録のURLか確認 */
 			const regexp_2 = /commons\.nicovideo\.jp\/tree\/edit\/(lv\d{1,20})/;
@@ -101,18 +98,12 @@ browser.tabs.onUpdated.addListener((tab_id, change_info, tab) => {
 
 
 /* --- キューに追加 --- */
-const addQueue = (tab_id, url) => {
-	/* URLの型チェック */
-	if (typeof url === 'object') {
-		queue = queue.concat(url.slice(0, -1).filter(page => checkURL(page)));
-		addQueue(tab_id, url[url.length-1]);
-		return;
-	}
+const addQueue = (tab_id, url, tmp_ready = true) => {
 	/* URLのチェック */
-	if (!checkURL(url)) return;
+	if (!checkURL(tab_id, url)) return;
 	/* URLを登録処理へ */
 	queue.push(url);
-	if (ready) sendQueue();
+	if (ready && tmp_ready) sendQueue();
 };
 
 
@@ -124,7 +115,8 @@ const sendQueue = () => {
 };
 
 
-const checkURL = url => {
+/* --- IDを抽出できるURLかチェックする --- */
+const checkURL = (tab_id, url) => {
 	/* URLのチェック */
 	const regexp = /(?:www|commons)\.nicovideo\.jp\/(?:watch|tree)\/((?:sm|so)?\d{1,20})/;
 	let matches  = regexp.exec(url);
