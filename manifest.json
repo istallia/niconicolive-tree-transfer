@@ -13,6 +13,10 @@
 		{
 			"matches" : ["*://commons.nicovideo.jp/tree/edit/*"],
 			"js"      : ["content-script.js"]
+		},
+		{
+			"matches" : ["*://www.nicovideo.jp/watch/*"],
+			"js"      : ["content-script-video.js"]
 		}
 	],
 	"background": {
@@ -26,6 +30,7 @@
 		"default_popup" : "popup.html"
 	},
 	"permissions" : [
+		"*://www.nicovideo.jp/watch/*",
 		"*://commons.nicovideo.jp/tree/edit/*",
 		"tabs"
 	]

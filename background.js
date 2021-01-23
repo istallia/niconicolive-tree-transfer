@@ -126,9 +126,8 @@ const checkURL = (tab_id, url) => {
 	const video_id = matches[1];
 	if (video_id.slice(0, 2) !== 'sm' && video_id.slice(0, 2) !== 'so') {
 		/* コミュニティに紐ついてる動画かもしれないのでリクエストを送信 */
-		browser.tabs.sendMessage(tab_id, {ctrl:'request-commons-url'}, response => {
-			addQueue(tab_id, response.url);
-		});
+		const addQueueTemp = (tab_id, response) => addQueue(tab_id, response.url);
+		browser.tabs.sendMessage(tab_id, {ctrl:'request-commons-url'}, addQueueTemp.bind(this, tab_id));
 		return false;
 	}
 	return true;

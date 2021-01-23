@@ -4,7 +4,7 @@ let is_adding  = false;
 if (typeof browser === 'undefined') browser = chrome;
 browser.runtime.sendMessage({ctrl:'get-status'}, response => {
 	/* 変数の更新 */
-	is_working     = Boolean(response.is_working);
+	is_working = Boolean(response.is_working);
 	/* DOM監視イベントの登録 */
 	const target   = document.getElementById('candidate');
 	const observer = new MutationObserver(records => {
