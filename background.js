@@ -4,6 +4,8 @@ let is_working   = false;
 let tab_id_video = null;
 let tab_id_tree  = null;
 let live_id      = null;
+let ready        = false;
+let queue        = [];
 
 
 /* --- 各種sendMessageに応答する --- */
@@ -24,6 +26,8 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		live_id      = message.live_id;
 		tab_id_video = message.tab_id_video;
 		tab_id_tree  = message.tab_id_tree;
+		ready        = false;
+		queue        = [];
 		sendResponse({is_working:true});
 		if (tab_id_tree !== null) {
 			browser.tabs.get(tab_id_video, tab => {
@@ -46,6 +50,8 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		live_id      = null;
 		tab_id_video = null;
 		tab_id_tree  = null;
+		ready        = false;
+		queue        = [];
 		sendResponse({is_working:false});
 	}
 	/* チャンネルに紐ついた動画のIDの処理 */
@@ -65,6 +71,8 @@ browser.tabs.onRemoved.addListener((tab_id, close_info) => {
 			live_id      = null;
 			tab_id_video = null;
 			tab_id_tree  = null;
+			ready        = false;
+			queue        = [];
 		}
 	}
 });
@@ -77,9 +85,14 @@ browser.tabs.onUpdated.addListener((tab_id, change_info, tab) => {
 			/* ツリー登録ページに送信 */
 			sendToContentsTree(tab.url);
 		} else if (tab_id === tab_id_tree) {
+			/* ツリー登録のURLか確認 */
+			const regexp_2 = /commons\.nicovideo\.jp\/tree\/edit\/(lv\d{1,20})/;
+			if (regexp_2.test(tab.url)) {
+				ready = true;
+			}
 			/* ツリー登録後のURLか確認 */
-			const regexp = /commons\.nicovideo\.jp\/tree\/(lv\d{1,20})/;
-			if (!regexp.test(tab.url)) return;
+			const regexp_1 = /commons\.nicovideo\.jp\/tree\/(lv\d{1,20})/;
+			if (!regexp_1.test(tab.url)) return;
 			/* ツリー登録ページに戻す */
 			browser.tabs.update(tab_id, {url:'https://commons.nicovideo.jp/tree/edit/'+live_id});
 		}
@@ -96,6 +109,7 @@ const sendToContentsTree = url => {
 	const video_id = matches[1];
 	/* content-script側に送信 */
 	browser.tabs.sendMessage(tab_id_tree, {ctrl:'add', id:video_id});
+	ready = false;
 };
 
 
@@ -111,4 +125,5 @@ const sendArrayToContentsTree = urls => {
 	}
 	/* content-script側に送信 */
 	browser.tabs.sendMessage(tab_id_tree, {ctrl:'add', id:video_ids.join(' ')});
+	ready = false;
 };
