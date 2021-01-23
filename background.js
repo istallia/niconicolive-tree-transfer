@@ -48,6 +48,10 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		tab_id_tree  = null;
 		sendResponse({is_working:false});
 	}
+	/* チャンネルに紐ついた動画のIDの処理 */
+	if (message.ctrl === 'add-video-so') {
+		sendToContentsTree(message.url);
+	}
 });
 
 
@@ -86,7 +90,7 @@ browser.tabs.onUpdated.addListener((tab_id, change_info, tab) => {
 /* --- ツリー登録ページにIDを送信 --- */
 const sendToContentsTree = url => {
 	/* 動画IDを取得 */
-	const regexp = /www\.nicovideo\.jp\/watch\/(sm\d{1,20})/;
+	const regexp = /(?:www|commons)\.nicovideo\.jp\/(?:watch|tree)\/((?:sm|so)\d{1,20})/;
 	let matches  = regexp.exec(url);
 	if (matches === null || matches.length < 1) return;
 	const video_id = matches[1];
