@@ -112,11 +112,15 @@ const addQueue = (tab_id, url) => {
 	if (!checkURL(url)) return;
 	/* URLを登録処理へ */
 	queue.push(url);
-	if (ready) {
-		const adding_queue = queue.slice(0,10);
-		queue              = queue.filter(url => adding_queue.indexOf(url) === -1);
-		sendArrayToContentsTree(adding_queue);
-	}
+	if (ready) sendQueue();
+};
+
+
+/* --- キューを送信 --- */
+const sendQueue = () => {
+	const adding_queue = queue.slice(0,10);
+	queue              = queue.filter(page => adding_queue.indexOf(page) === -1);
+	sendArrayToContentsTree(adding_queue);
 };
 
 
