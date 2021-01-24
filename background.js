@@ -88,6 +88,7 @@ browser.tabs.onUpdated.addListener((tab_id, change_info, tab) => {
 			const regexp_2 = /commons\.nicovideo\.jp\/tree\/edit\/(lv\d{1,20})/;
 			if (regexp_2.test(tab.url)) {
 				ready = true;
+				if (queue.length > 0) sendQueue();
 			}
 			/* ツリー登録後のURLか確認 */
 			const regexp_1 = /commons\.nicovideo\.jp\/tree\/(lv\d{1,20})/;
