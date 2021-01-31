@@ -23,6 +23,8 @@ browser.runtime.sendMessage({ctrl:'get-status'}, response => {
 				setTimeout(() => {
 					document.getElementById('send_check').dispatchEvent(new Event('click', {bubbles: true, composed: true}));
 				}, 0);
+			} else {
+				browser.runtime.sendMessage({ctrl:'ready-tree'});
 			}
 		}
 	});

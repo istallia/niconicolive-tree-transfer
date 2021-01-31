@@ -29,7 +29,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		ready        = false;
 		queue        = [];
 		sendResponse({is_working:true});
-		if (tab_id_tree !== null) {
+		if (tab_id_video !== null) {
 			browser.tabs.get(tab_id_video, tab => {
 				addQueue(tab.id, tab.url);
 			});
@@ -57,6 +57,11 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		addQueue(sender.tab.id, message.url);
 		return;
 	}
+	/* IDがかぶった場合に再アクティブ化する処理 */
+	if (message.ctrl === 'ready-tree') {
+		ready = true;
+		if (queue.length > 0) sendQueue();
+	}
 });
 
 
@@ -80,7 +85,7 @@ browser.tabs.onRemoved.addListener((tab_id, close_info) => {
 /* --- タブ更新検知 --- */
 browser.tabs.onUpdated.addListener((tab_id, change_info, tab) => {
 	if (is_working && change_info.status === 'complete') {
-		if (tab_id === tab_id_video || tab_id_video === null) {
+		if (tab_id === tab_id_video || (tab_id_video === null && tab_id !== tab_id_tree)) {
 			/* ツリー登録ページに送信 */
 			addQueue(tab_id, tab.url);
 		} else if (tab_id === tab_id_tree) {
