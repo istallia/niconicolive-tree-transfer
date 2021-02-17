@@ -4,6 +4,8 @@ let is_working   = false;
 let tab_id_video = null;
 let tab_id_tree  = null;
 let live_id      = null;
+let ready        = false;
+let queue        = [];
 
 
 /* --- 各種sendMessageに応答する --- */
@@ -24,18 +26,17 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		live_id      = message.live_id;
 		tab_id_video = message.tab_id_video;
 		tab_id_tree  = message.tab_id_tree;
+		ready        = false;
+		queue        = [];
 		sendResponse({is_working:true});
-		if (tab_id_tree !== null) {
+		if (tab_id_video !== null) {
 			browser.tabs.get(tab_id_video, tab => {
-				setTimeout(() => sendToContentsTree(tab.url), 2000);
+				addQueue(tab.id, tab.url);
 			});
 		} else {
 			browser.tabs.query({url:'*://www.nicovideo.jp/watch/*'}, tabs => {
-				let urls = [];
-				for (let i in tabs) {
-					if (urls.length < 10) urls.push(tabs[i].url);
-				}
-				setTimeout(() => sendArrayToContentsTree(urls, 2000));
+				for (let i in tabs.slice(0, -1)) addQueue(tabs[i].id, tabs[i].url, false);
+				addQueue(tabs[tabs.length-1].id, tabs[tabs.length-1].url);
 			});
 		}
 		return;
@@ -46,11 +47,20 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		live_id      = null;
 		tab_id_video = null;
 		tab_id_tree  = null;
+		ready        = false;
+		queue        = [];
 		sendResponse({is_working:false});
+		return;
 	}
 	/* チャンネルに紐ついた動画のIDの処理 */
 	if (message.ctrl === 'add-video-so') {
-		sendToContentsTree(message.url);
+		addQueue(sender.tab.id, message.url);
+		return;
+	}
+	/* IDがかぶった場合に再アクティブ化する処理 */
+	if (message.ctrl === 'ready-tree') {
+		ready = true;
+		if (queue.length > 0) sendQueue();
 	}
 });
 
@@ -65,6 +75,8 @@ browser.tabs.onRemoved.addListener((tab_id, close_info) => {
 			live_id      = null;
 			tab_id_video = null;
 			tab_id_tree  = null;
+			ready        = false;
+			queue        = [];
 		}
 	}
 });
@@ -73,13 +85,19 @@ browser.tabs.onRemoved.addListener((tab_id, close_info) => {
 /* --- タブ更新検知 --- */
 browser.tabs.onUpdated.addListener((tab_id, change_info, tab) => {
 	if (is_working && change_info.status === 'complete') {
-		if (tab_id === tab_id_video || tab_id_video === null) {
+		if (tab_id === tab_id_video || (tab_id_video === null && tab_id !== tab_id_tree)) {
 			/* ツリー登録ページに送信 */
-			sendToContentsTree(tab.url);
+			addQueue(tab_id, tab.url);
 		} else if (tab_id === tab_id_tree) {
+			/* ツリー登録のURLか確認 */
+			const regexp_2 = /commons\.nicovideo\.jp\/tree\/edit\/(lv\d{1,20})/;
+			if (regexp_2.test(tab.url)) {
+				ready = true;
+				if (queue.length > 0) sendQueue();
+			}
 			/* ツリー登録後のURLか確認 */
-			const regexp = /commons\.nicovideo\.jp\/tree\/(lv\d{1,20})/;
-			if (!regexp.test(tab.url)) return;
+			const regexp_1 = /commons\.nicovideo\.jp\/tree\/(lv\d{1,20})/;
+			if (!regexp_1.test(tab.url)) return;
 			/* ツリー登録ページに戻す */
 			browser.tabs.update(tab_id, {url:'https://commons.nicovideo.jp/tree/edit/'+live_id});
 		}
@@ -87,22 +105,58 @@ browser.tabs.onUpdated.addListener((tab_id, change_info, tab) => {
 });
 
 
-/* --- ツリー登録ページにIDを送信 --- */
-const sendToContentsTree = url => {
-	/* 動画IDを取得 */
-	const regexp = /(?:www|commons)\.nicovideo\.jp\/(?:watch|tree)\/((?:sm|so)\d{1,20})/;
-	let matches  = regexp.exec(url);
-	if (matches === null || matches.length < 1) return;
-	const video_id = matches[1];
-	/* content-script側に送信 */
-	browser.tabs.sendMessage(tab_id_tree, {ctrl:'add', id:video_id});
+/* --- キューに追加 --- */
+const addQueue = (tab_id, url, tmp_ready = true) => {
+	/* URLのチェック */
+	if (!checkURL(tab_id, url)) return;
+	/* URLを登録処理へ */
+	queue.push(url);
+	if (ready && tmp_ready) sendQueue();
 };
+
+
+/* --- キューを送信 --- */
+const sendQueue = () => {
+	const adding_queue = queue.slice(0,10);
+	queue              = queue.filter(page => adding_queue.indexOf(page) === -1);
+	sendArrayToContentsTree(adding_queue);
+};
+
+
+/* --- IDを抽出できるURLかチェックする --- */
+const checkURL = (tab_id, url) => {
+	/* URLのチェック */
+	const regexp = /(?:www|commons)\.nicovideo\.jp\/(?:watch|tree)\/((?:sm|so)?\d{1,20})/;
+	let matches  = regexp.exec(url);
+	if (matches === null || matches.length < 1) return false;
+	const video_id = matches[1];
+	if (video_id.slice(0, 2) !== 'sm' && video_id.slice(0, 2) !== 'so') {
+		/* コミュニティに紐ついてる動画かもしれないのでリクエストを送信 */
+		const addQueueTemp = (tab_id, response) => addQueue(tab_id, response.url);
+		browser.tabs.sendMessage(tab_id, {ctrl:'request-commons-url'}, addQueueTemp.bind(this, tab_id));
+		return false;
+	}
+	return true;
+};
+
+
+/* --- ツリー登録ページにIDを送信 --- */
+// const sendToContentsTree = url => {
+// 	/* 動画IDを取得 */
+// 	const regexp = /(?:www|commons)\.nicovideo\.jp\/(?:watch|tree)\/((?:sm|so)\d{1,20})/;
+// 	let matches  = regexp.exec(url);
+// 	if (matches === null || matches.length < 1) return;
+// 	const video_id = matches[1];
+// 	/* content-script側に送信 */
+// 	browser.tabs.sendMessage(tab_id_tree, {ctrl:'add', id:video_id});
+// 	ready = false;
+// };
 
 
 /* --- ツリー登録ページにIDを送信(初期/複数) --- */
 const sendArrayToContentsTree = urls => {
 	/* 動画IDを取得 */
-	const regexp = /www\.nicovideo\.jp\/watch\/(sm\d{1,20})/;
+	const regexp = /(?:www|commons)\.nicovideo\.jp\/(?:watch|tree)\/((?:sm|so)\d{1,20})/;
 	let video_ids = [];
 	for (let i in urls) {
 		let matches  = regexp.exec(urls[i]);
@@ -110,5 +164,8 @@ const sendArrayToContentsTree = urls => {
 		video_ids.push(matches[1]);
 	}
 	/* content-script側に送信 */
-	browser.tabs.sendMessage(tab_id_tree, {ctrl:'add', id:video_ids.join(' ')});
+	if (video_ids.length > 0) {
+		browser.tabs.sendMessage(tab_id_tree, {ctrl:'add', id:video_ids.join(' ')});
+		ready = false;
+	}
 };
