@@ -17,6 +17,10 @@
 		{
 			"matches" : ["*://www.nicovideo.jp/watch/*"],
 			"js"      : ["content-script-video.js"]
+		},
+		{
+			"matches" : ["*://live2.nicovideo.jp/watch/*"],
+			"js"      : ["content-script-quoted-video.js"]
 		}
 	],
 	"background": {

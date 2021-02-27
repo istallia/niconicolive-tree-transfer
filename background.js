@@ -53,7 +53,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		return;
 	}
 	/* チャンネルに紐ついた動画のIDの処理 */
-	if (message.ctrl === 'add-video-so') {
+	if (message.ctrl === 'add-video-so' && message.ctrl === 'add-quoted-video') {
 		addQueue(sender.tab.id, message.url);
 		return;
 	}
