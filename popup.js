@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', event => {
 			/* ニコ生IDを取得 */
 			browser.tabs.query({active:true,currentWindow:true}, tabs => {
 				/* ニコ生IDを取得 */
-				const regexp = /live\d\.nicovideo\.jp\/watch\/(lv\d{1,20})/;
+				const regexp = /live\d?\.nicovideo\.jp\/watch\/(lv\d{1,20})/;
 				let matches  = regexp.exec(tabs[0].url);
 				if (matches === null || matches.length < 1) {
 					/* 開いているタブがニコ生ではない場合 */
