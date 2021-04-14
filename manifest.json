@@ -1,7 +1,7 @@
 {
 	"manifest_version" : 2,
 	"name"             : "ニコ生ツリー転送ツール",
-	"version"          : "0.1.1",
+	"version"          : "0.1.2",
 	"description"      : "ニコ生でニコニコの動画を流す際、指定タブ(ニコ動)で開いた動画や引用動画を自動でコンテンツツリーに登録する拡張機能",
 	"author"           : "istallia",
 	"icons" : {
@@ -19,7 +19,7 @@
 			"js"      : ["content-script-video.js"]
 		},
 		{
-			"matches" : ["*://live2.nicovideo.jp/watch/*"],
+			"matches" : ["*://live.nicovideo.jp/watch/*", "*://live2.nicovideo.jp/watch/*"],
 			"js"      : ["content-script-quoted-video.js"]
 		}
 	],
@@ -34,6 +34,8 @@
 		"default_popup" : "popup.html"
 	},
 	"permissions" : [
+		"*://live.nicovideo.jp/watch/*",
+		"*://live2.nicovideo.jp/watch/*",
 		"*://www.nicovideo.jp/watch/*",
 		"*://commons.nicovideo.jp/tree/edit/*",
 		"tabs"
