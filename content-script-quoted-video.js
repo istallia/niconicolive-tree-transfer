@@ -1,4 +1,5 @@
 /* --- 引用動画を監視する --- */
+if (typeof browser === 'undefined') browser = chrome;
 const target   = document.querySelector('div[class^="___lock-item-area"]');
 const observer = new MutationObserver(records => {
 	for (let record of records) {
