@@ -8,7 +8,7 @@ const observer = new MutationObserver(records => {
 		for (let addedNode of record.addedNodes) {
 			if (addedNode.tagName.toLowerCase() !== 'div' || addedNode.getAttribute('class').indexOf('___launch-item-area') !== 0) continue;
 			const img = addedNode.querySelector('button > img');
-			if (img.src.indexOf('https://nicovideo.cdn.nimg.jp/thumbnails/') !== 0) continue;
+			if (!img || !img.src || img.src.indexOf('https://nicovideo.cdn.nimg.jp/thumbnails/') !== 0) continue;
 			const regexp = /\/(\d{1,20})\//;
 			let matches  = regexp.exec(img.src);
 			if (matches === null || matches.length < 1) continue;
