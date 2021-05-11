@@ -1,7 +1,7 @@
 {
 	"manifest_version" : 2,
 	"name"             : "ニコ生ツリー転送ツール",
-	"version"          : "0.1.3",
+	"version"          : "0.1.4",
 	"description"      : "ニコ生でニコニコの動画を流す際、指定タブ(ニコ動)で開いた動画や引用動画を自動でコンテンツツリーに登録する拡張機能",
 	"author"           : "istallia",
 	"icons" : {
